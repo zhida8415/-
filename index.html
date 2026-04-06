@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>零錢終結者 Pro - 最佳付款計算機</title>
+    <title>零錢終結者 - 最佳付款計算機</title>
     <style>
         body {
             font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
@@ -17,6 +17,7 @@
             text-align: center;
             color: #2c3e50;
             margin-bottom: 30px;
+            font-size: 1.8em;
         }
         .card {
             background: white;
@@ -27,7 +28,7 @@
         }
         .grid-container {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr; /* 電腦版：分成兩欄 */
             gap: 15px;
         }
         .input-group {
@@ -47,6 +48,8 @@
             border-radius: 6px;
             font-size: 16px;
             text-align: center;
+            /* 避免手機點擊輸入框時畫面自動放大 */
+            touch-action: manipulation; 
         }
         .bill-label { color: #2980b9; }
         .coin-label { color: #d35400; }
@@ -95,11 +98,28 @@
             font-weight: bold;
             font-size: 1.2em;
         }
+
+        /* ✨ 這裡就是為手機特別加上的神奇魔法 (RWD 響應式設計) ✨ */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px; /* 手機版邊界縮小一點 */
+            }
+            .grid-container {
+                grid-template-columns: 1fr; /* 手機版：變成單一欄位（上下排列） */
+                gap: 5px;
+            }
+            .button-group {
+                flex-direction: column; /* 手機版：按鈕也改成上下排列，比較好點擊 */
+            }
+            button {
+                width: 100%; /* 按鈕寬度填滿 */
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h1>零錢終結者</h1>
+    <h1>零錢終結者 - 最佳付款計算機</h1>
     
     <div class="card">
         <h3>1. 錢包裡有多少錢？</h3>
@@ -131,26 +151,19 @@
 
     <div class="button-group">
         <button onclick="calculateBestPayment()">⚡ 開始計算</button>
-        <button class="reset-btn" onclick="resetApp()">🔄 重製</button>
+        <button class="reset-btn" onclick="resetApp()">🔄 重置</button>
     </div>
 
     <div id="result"></div>
 
     <script>
-        // 你錢包裡可能有的所有面額
         const denoms = [2000, 1000, 500, 200, 100, 50, 20, 10, 5, 1];
-        
-        // 店員收銀機裡用來找錢的面額（移除了 200 和 20）
         const clerkDenoms = [2000, 1000, 500, 100, 50, 10, 5, 1];
 
-        // 計算店員的找零方式
         function getChangeBreakdown(amount) {
             let change = {};
-            // 先把所有面額預設為 0
             denoms.forEach(d => change[d] = 0);
-            
             let remaining = amount;
-            // 找零時，只使用店員有的面額 (clerkDenoms)
             for (let d of clerkDenoms) {
                 change[d] = Math.floor(remaining / d);
                 remaining %= d;
